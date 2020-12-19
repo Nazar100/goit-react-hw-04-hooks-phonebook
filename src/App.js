@@ -1,6 +1,6 @@
 import shortid from 'shortid';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import './App.css';
 
 import ContactsForm from './components/Form/ContactsForm';
@@ -8,9 +8,12 @@ import Contacts from './components/Contacts/Contacts';
 import Filter from './components/Filter/Filter';
 
 function App() {
-  const [contacts, setContacts] = useState(() => {
-    return JSON.parse(window.localStorage.getItem('contacts')) ?? [];
-  });
+  const [contacts, setContacts] = useState([]);
+
+  useEffect(() => {
+    const contacts = JSON.parse(window.localStorage.getItem('contacts')) ?? [];
+    setContacts(contacts);
+  }, []);
 
   useEffect(() => {
     window.localStorage.setItem('contacts', JSON.stringify(contacts));
@@ -50,15 +53,14 @@ function App() {
     setFilterState(e.target.value);
   };
 
-  const getVisibleContacts = () => {
+  // просто для практики
+  const filteredContacts = useMemo(() => {
     const normalizedFilter = filterState.toLowerCase();
 
     return contacts.filter(contact => {
       return contact.name.toLowerCase().includes(normalizedFilter);
     });
-  };
-
-  const filteredContacts = getVisibleContacts();
+  }, [contacts, filterState]);
 
   return (
     <div className="container">
